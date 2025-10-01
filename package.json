@@ -5,7 +5,7 @@
   "description": "Electronics Workshop API",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node backend/src/app.js",
     "dev": "nodemon index.js"
   },
   "engines": {
