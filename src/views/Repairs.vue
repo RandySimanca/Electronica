@@ -186,9 +186,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import api from "@/services/api";
 
 const technicians = ref([]);
 const repairs = ref([]);
@@ -205,7 +203,6 @@ const repair = ref({
   assigned_to: ""
 });
 
-// Contadores para los filtros
 const pendingCount = computed(() => 
   repairs.value.filter(r => r.status === 'pendiente').length
 );
@@ -216,13 +213,11 @@ const completedCount = computed(() =>
   repairs.value.filter(r => r.status === 'completada').length
 );
 
-// Reparaciones filtradas
 const filteredRepairs = computed(() => {
   if (filter.value === 'all') return repairs.value;
   return repairs.value.filter(r => r.status === filter.value);
 });
 
-// Cargar técnicos según la sección
 async function loadTechnicians() {
   if (!repair.value.section) {
     technicians.value = [];
@@ -230,14 +225,9 @@ async function loadTechnicians() {
   }
 
   try {
-    const { data } = await axios.get(
-      `${API_URL}/api/repairs/technicians/${repair.value.section}`,
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-    
+    const { data } = await api.get(`/repairs/technicians/${repair.value.section}`);
     technicians.value = Array.isArray(data) ? data : [];
     repair.value.assigned_to = "";
-    
   } catch (error) {
     console.error("Error:", error.response?.data);
     alert(error.response?.data?.error || "Error al cargar técnicos");
@@ -245,29 +235,21 @@ async function loadTechnicians() {
   }
 }
 
-// Cargar reparaciones
 async function loadRepairs() {
   try {
-    const { data } = await axios.get(`${API_URL}/api/repairs`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
+    const { data } = await api.get('/repairs');
     repairs.value = data;
   } catch (error) {
     console.error("Error al cargar reparaciones:", error);
   }
 }
 
-// Registrar reparación
 async function handleSubmit() {
   loading.value = true;
   try {
-    await axios.post(`${API_URL}/api/repairs`, repair.value, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
-
+    await api.post('/repairs', repair.value);
     alert("✅ Reparación registrada exitosamente");
     
-    // Reset form
     repair.value = {
       client_name: "",
       client_phone: "",
@@ -278,7 +260,6 @@ async function handleSubmit() {
       assigned_to: ""
     };
     technicians.value = [];
-    
     loadRepairs();
   } catch (error) {
     console.error("Error al registrar reparación:", error);
@@ -288,7 +269,6 @@ async function handleSubmit() {
   }
 }
 
-// Formatear estado
 function formatStatus(status) {
   const statusMap = {
     pendiente: "Pendiente",
@@ -298,7 +278,6 @@ function formatStatus(status) {
   return statusMap[status] || status;
 }
 
-// Formatear sección
 function formatSection(section) {
   const sectionMap = {
     electronica: "📺 Electrónica",
@@ -308,7 +287,6 @@ function formatSection(section) {
   return sectionMap[section] || section;
 }
 
-// Formatear fecha
 function formatDate(date) {
   return new Date(date).toLocaleDateString('es-ES', {
     year: 'numeric',
