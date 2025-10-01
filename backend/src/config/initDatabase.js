@@ -12,10 +12,10 @@ const initDatabase = async () => {
     if (!isProduction) {
       // 🔹 Modo LOCAL: crear la DB si no existe
       const tempPool = mysql.createPool({
-        host: config.DB_HOST,
-        user: config.DB_USER,
-        password: config.DB_PASSWORD,
-        port: config.DB_PORT,
+        host: config.DB.host,
+        user: config.DB.user,
+        password: config.DB.password,
+        port: config.DB.port,
         waitForConnections: true,
         connectionLimit: 1,
         queueLimit: 0,
@@ -23,18 +23,18 @@ const initDatabase = async () => {
 
       const tempConn = await tempPool.getConnection();
       await tempConn.execute(
-        `CREATE DATABASE IF NOT EXISTS ${config.DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+        `CREATE DATABASE IF NOT EXISTS \`${config.DB.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
       );
       tempConn.release();
       await tempPool.end();
 
       // Conectar al pool con base incluida
       pool = mysql.createPool({
-        host: config.DB_HOST,
-        user: config.DB_USER,
-        password: config.DB_PASSWORD,
-        database: config.DB_NAME,
-        port: config.DB_PORT,
+        host: config.DB.host,
+        user: config.DB.user,
+        password: config.DB.password,
+        database: config.DB.database,
+        port: config.DB.port,
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0,
@@ -42,11 +42,11 @@ const initDatabase = async () => {
     } else {
       // 🔹 Modo PRODUCCIÓN: usar JawsDB directamente
       pool = mysql.createPool({
-        host: config.DB_HOST,
-        user: config.DB_USER,
-        password: config.DB_PASSWORD,
-        database: config.DB_NAME,
-        port: config.DB_PORT,
+        host: config.DB.host,
+        user: config.DB.user,
+        password: config.DB.password,
+        database: config.DB.database,
+        port: config.DB.port,
         waitForConnections: true,
         connectionLimit: 10,
         queueLimit: 0,
@@ -55,7 +55,7 @@ const initDatabase = async () => {
 
     const conn = await pool.getConnection();
 
-    // ✅ Aquí ya puedes crear tablas si no existen (esto sí está permitido en JawsDB)
+    // ✅ Crear tablas si no existen (esto funciona en JawsDB)
     await conn.execute(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -76,11 +76,10 @@ const initDatabase = async () => {
       ON DUPLICATE KEY UPDATE nombre=nombre
     `);
 
-    // Resto de tus tablas...
-    // clientes, productos, ventas, items_venta, reparaciones
+    // Aquí puedes seguir creando clientes, productos, ventas, items_venta, reparaciones...
 
     conn.release();
-    console.log(`✅ Tablas inicializadas correctamente en '${config.DB_NAME}'`);
+    console.log(`✅ Tablas inicializadas correctamente en '${config.DB.database}'`);
 
     return pool;
   } catch (error) {
