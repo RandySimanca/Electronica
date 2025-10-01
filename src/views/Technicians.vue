@@ -67,13 +67,11 @@
             <p class="date">Recibido: {{ formatDate(repair.created_at) }}</p>
           </div>
 
-          <!-- Diagnóstico existente -->
           <div v-if="repair.diagnosis" class="diagnosis-box">
             <strong>📋 Diagnóstico:</strong>
             <p>{{ repair.diagnosis }}</p>
           </div>
 
-          <!-- Formulario para agregar/editar diagnóstico -->
           <div v-if="repair.status !== 'completada'" class="diagnosis-form">
             <label>{{ repair.diagnosis ? 'Actualizar Diagnóstico:' : 'Agregar Diagnóstico:' }}</label>
             <textarea 
@@ -90,7 +88,6 @@
             </button>
           </div>
 
-          <!-- Acciones de estado -->
           <div class="actions">
             <button 
               v-if="repair.status === 'pendiente'" 
@@ -124,15 +121,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import api from "@/services/api";
 
 const repairs = ref([]);
 const activeFilter = ref('all');
 const diagnosisInputs = ref({});
 
-// Contadores
 const pendingCount = computed(() => 
   repairs.value.filter(r => r.status === 'pendiente').length
 );
@@ -143,21 +137,16 @@ const completedCount = computed(() =>
   repairs.value.filter(r => r.status === 'completada').length
 );
 
-// Reparaciones filtradas
 const filteredRepairs = computed(() => {
   if (activeFilter.value === 'all') return repairs.value;
   return repairs.value.filter(r => r.status === activeFilter.value);
 });
 
-// Cargar reparaciones asignadas al técnico
 async function loadRepairs() {
   try {
-    const { data } = await axios.get(`${API_URL}/api/repairs`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
+    const { data } = await api.get('/repairs');
     repairs.value = data;
     
-    // Inicializar inputs de diagnóstico
     data.forEach(repair => {
       if (!diagnosisInputs.value[repair.id]) {
         diagnosisInputs.value[repair.id] = repair.diagnosis || "";
@@ -169,7 +158,6 @@ async function loadRepairs() {
   }
 }
 
-// Guardar diagnóstico
 async function saveDiagnosis(repairId) {
   const diagnosis = diagnosisInputs.value[repairId];
   
@@ -179,12 +167,7 @@ async function saveDiagnosis(repairId) {
   }
 
   try {
-    await axios.put(
-      `${API_URL}/api/repairs/${repairId}/diagnosis`,
-      { diagnosis },
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-
+    await api.put(`/repairs/${repairId}/diagnosis`, { diagnosis });
     alert("✅ Diagnóstico guardado exitosamente");
     loadRepairs();
   } catch (error) {
@@ -193,15 +176,9 @@ async function saveDiagnosis(repairId) {
   }
 }
 
-// Actualizar estado
 async function updateStatus(repairId, newStatus) {
   try {
-    await axios.put(
-      `${API_URL}/api/repairs/${repairId}/status`,
-      { status: newStatus },
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-
+    await api.put(`/repairs/${repairId}/status`, { status: newStatus });
     alert(`✅ Estado actualizado a: ${formatStatus(newStatus)}`);
     loadRepairs();
   } catch (error) {
@@ -210,7 +187,6 @@ async function updateStatus(repairId, newStatus) {
   }
 }
 
-// Formatear estado
 function formatStatus(status) {
   const statusMap = {
     pendiente: "Pendiente",
@@ -220,7 +196,6 @@ function formatStatus(status) {
   return statusMap[status] || status;
 }
 
-// Formatear fecha
 function formatDate(date) {
   return new Date(date).toLocaleDateString('es-ES', {
     year: 'numeric',
@@ -528,5 +503,4 @@ onMounted(() => {
     width: 100%;
   }
 }
-
 </style>
