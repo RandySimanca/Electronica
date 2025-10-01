@@ -36,7 +36,7 @@ export const createUser = async (req, res) => {
 
     // Insertar usuario
     await pool.execute(
-      "INSERT INTO usuarios (nombre, email, contraseña, rol, section, active) VALUES (?, ?, ?, ?, ?, TRUE)",
+      "INSERT INTO usuarios (nombre, email, password, rol, section, active) VALUES (?, ?, ?, ?, ?, TRUE)",
       [username, email, hashedPassword, role, section || null]
     );
 
@@ -73,7 +73,7 @@ export const updateUser = async (req, res) => {
 
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
-      query = "UPDATE usuarios SET nombre=?, email=?, contraseña=?, rol=?, section=?, active=? WHERE id=?";
+      query = "UPDATE usuarios SET nombre=?, email=?, password=?, rol=?, section=?, active=? WHERE id=?";
       values = [username, email, hashedPassword, role, section || null, active, id];
     }
 

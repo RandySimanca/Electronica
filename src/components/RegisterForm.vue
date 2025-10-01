@@ -4,7 +4,7 @@
     <form @submit.prevent="handleRegister">
       <input v-model="nombre" placeholder="Nombre" required />
       <input v-model="email" type="email" placeholder="Email" required />
-      <input v-model="contraseña" type="password" placeholder="Contraseña" required />
+      <input v-model="password" type="password" placeholder="Contraseña" required />
       <select v-model="rol" required>
         <option value="" disabled>Selecciona un rol</option>
         <option value="admin">Admin</option>
@@ -29,7 +29,7 @@ import api from "@/services/api";
 
 const nombre = ref("");
 const email = ref("");
-const contraseña = ref("");
+const password = ref("");
 const rol = ref("");
 const loading = ref(false);
 const error = ref("");
@@ -46,7 +46,7 @@ async function handleRegister() {
     const res = await api.post("/auth/register", {
       nombre: nombre.value,
       email: email.value,
-      contraseña: contraseña.value,
+      password: password.value,
       rol: rol.value,
     });
 

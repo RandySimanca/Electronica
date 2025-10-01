@@ -28,17 +28,17 @@ const requirePool = (req, res, next) => {
 
 // Registrar usuario (solo admin)
 router.post("/register", requirePool, authenticateToken, authorizeRole([USER_ROLES.ADMIN]), async (req, res) => {
-  const { nombre, email, contraseña, rol } = req.body;
+  const { nombre, email, password, rol } = req.body;
 
-  if (!nombre || !email || !contraseña || !rol) {
+  if (!nombre || !email || !password || !rol) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(contraseña, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const [result] = await pool.execute(
-      "INSERT INTO usuarios (nombre, email, contraseña, rol) VALUES (?, ?, ?, ?)",
+      "INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)",
       [nombre, email, hashedPassword, rol]
     );
 
@@ -66,7 +66,7 @@ router.post("/login", requirePool, async (req, res) => {
 
     const user = rows[0];
 
-    const validPassword = await bcrypt.compare(password, user.contraseña);
+    const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return res.status(401).json({ error: "Contraseña incorrecta" });
     }

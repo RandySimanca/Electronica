@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(50) NOT NULL UNIQUE,
   email VARCHAR(100) NOT NULL UNIQUE,
-  contraseña VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
   rol ENUM('admin','vendedor','tecnico') NOT NULL,
   section ENUM('electronica','sistemas','celulares') NULL,
   active BOOLEAN DEFAULT TRUE,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 -- Insertar usuario admin (contraseña: admin)
 -- Contraseña está encriptada con bcrypt (cost=10)
-INSERT INTO usuarios (nombre, email, contraseña, rol, active)
+INSERT INTO usuarios (nombre, email, password, rol, active)
 VALUES ('admin', 'admin@store.com', '$2a$10$nnrHhIuuwawhk2pJ/3oKguFPl8Km.frmRLQLkSqY1lifkVb1vI/Ou', 'admin', TRUE)
 ON DUPLICATE KEY UPDATE nombre=nombre;
 

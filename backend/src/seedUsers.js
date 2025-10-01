@@ -7,15 +7,15 @@ const seedUsers = async () => {
     const conn = await pool.getConnection();
 
     const users = [
-      { nombre: "Admin", email: "admin@example.com", contraseña: "Admin123", rol: "admin" },
-      { nombre: "Vendedor", email: "vendedor@example.com", contraseña: "Vendedor123", rol: "vendedor" },
-      { nombre: "Técnico", email: "tecnico@example.com", contraseña: "Tecnico123", rol: "tecnico" },
+      { nombre: "Admin", email: "admin@example.com", password: "Admin123", rol: "admin" },
+      { nombre: "Vendedor", email: "vendedor@example.com", password: "Vendedor123", rol: "vendedor" },
+      { nombre: "Técnico", email: "tecnico@example.com", password: "Tecnico123", rol: "tecnico" },
     ];
 
     for (const user of users) {
-      const hashedPassword = await bcrypt.hash(user.contraseña, 10);
+      const hashedPassword = await bcrypt.hash(user.password, 10);
       await conn.execute(
-        `INSERT INTO usuarios (nombre, email, contraseña, rol) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)`,
         [user.nombre, user.email, hashedPassword, user.rol]
       );
     }
