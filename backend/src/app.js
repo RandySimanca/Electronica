@@ -19,24 +19,51 @@ validateConfig();
 
 const app = express();
 
-// Configuración de CORS dinámica
+// ============ CONFIGURACIÓN DE CORS MEJORADA ============
 const corsOptions = {
   origin: (origin, callback) => {
-    // Permitir requests sin origin (como mobile apps o curl)
-    if (!origin) return callback(null, true);
+    // Permitir requests sin origin (mobile apps, Postman, curl, mismo servidor)
+    if (!origin) {
+      return callback(null, true);
+    }
     
     // Lista de orígenes permitidos
-    const allowedOrigins = config.CORS_ORIGIN.split(',').map(o => o.trim());
+    const allowedOrigins = config.CORS_ORIGIN 
+      ? config.CORS_ORIGIN.split(',').map(o => o.trim())
+      : ['*'];
     
-    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
+    // Si CORS_ORIGIN es *, permitir cualquier origen
+    if (allowedOrigins.includes('*')) {
+      return callback(null, true);
     }
+    
+    // Verificar si el origen está en la lista permitida
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // En producción, permitir el propio dominio de Heroku
+    if (config.NODE_ENV === 'production') {
+      // Permitir el mismo host (cuando frontend y backend están juntos)
+      const requestHost = origin.replace(/^https?:\/\//, '');
+      const allowSameHost = true;
+      
+      if (allowSameHost) {
+        console.log(`✅ CORS permitido para: ${origin}`);
+        return callback(null, true);
+      }
+    }
+    
+    // Si llegamos aquí, rechazar
+    console.warn(`❌ CORS bloqueado para: ${origin}`);
+    callback(new Error('No permitido por CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
@@ -130,6 +157,7 @@ const startServer = async () => {
 │ 🚀 Puerto: ${config.PORT.toString().padEnd(30)}│
 │ 🌍 Entorno: ${config.NODE_ENV.padEnd(28)}│
 │ 🎨 Frontend: ${serveFrontend ? 'Activo'.padEnd(27) : 'Desactivado'.padEnd(27)}│
+│ 🔒 CORS: ${config.CORS_ORIGIN.padEnd(31)}│
 │ 📅 Iniciado: ${new Date().toLocaleString().padEnd(25)}│
 ├─────────────────────────────────────────────┤
 │ 📡 API: http://localhost:${config.PORT}/api          │
