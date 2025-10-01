@@ -1115,100 +1115,49 @@ function formatPaymentMethod(method) {
 
 /* Estilos específicos para impresión */
 @media print {
-  /* Ocultar todo excepto la factura */
   body * {
-    visibility: hidden;
+    display: none !important; /* Oculta todo */
   }
-  
-  .printable-invoice,
-  .printable-invoice * {
-    visibility: visible;
+
+  .printable-invoice {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    padding: 0.5cm !important;
   }
-  
-  .no-print {
+
+  /* Ocultar cualquier modal o contenedor extra */
+  .print-modal, .print-content, .no-print {
     display: none !important;
   }
-  
-  .printable-invoice {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    padding: 0.5cm;
-    margin: 0;
-  }
-  
-  .print-modal {
-    background: white;
-    position: static;
-  }
-  
-  .print-content {
-    max-width: none;
-    max-height: none;
-    overflow: visible;
-    box-shadow: none;
-  }
-  
-  /* Asegurar que el encabezado no se corte */
-  .invoice-print-header {
-    display: block;
-    page-break-inside: avoid;
-  }
-  
-  .company-section,
-  .invoice-info-section {
-    display: inline-block;
-    vertical-align: top;
-  }
-  
-  .company-section {
-    width: 55%;
-  }
-  
-  .invoice-info-section {
-    width: 40%;
-    float: right;
-  }
-  
-  /* Evitar saltos de página en lugares incorrectos */
+
+  /* Asegura que la tabla y secciones no se corten */
+  .invoice-print-header,
   .customer-section,
-  .payment-info {
-    page-break-inside: avoid;
+  .print-table,
+  .print-totals,
+  .payment-info,
+  .invoice-footer-print {
+    page-break-inside: avoid !important;
   }
-  
-  .print-table {
-    page-break-inside: auto;
-  }
-  
-  .print-table tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
-  }
-  
-  .print-table thead {
-    display: table-header-group;
-  }
-  
-  .print-totals {
-    page-break-inside: avoid;
-  }
-  
-  /* Ajustar tamaños para impresión */
-  .invoice-print-header {
-    font-size: 95%;
-  }
-  
-  .print-table {
-    font-size: 90%;
-  }
-  
-  /* Asegurar márgenes adecuados */
+
   @page {
     margin: 1.5cm 1cm;
     size: letter portrait;
   }
 }
+
+  /* Asegurar márgenes adecuados */
+  @page {
+    margin: 1.5cm 1cm;
+    size: letter portrait;
+  }
+
 
 @media (max-width: 768px) {
   .main-layout {
