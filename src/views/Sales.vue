@@ -165,7 +165,7 @@
     <!-- Modal de impresión de factura -->
     <div v-if="invoiceToPrint" class="print-modal" @click.self="invoiceToPrint = null">
       <div class="print-content">
-        <div class="print-header">
+        <div class="print-header no-print">
           <h2>Vista Previa de Factura</h2>
           <button @click="invoiceToPrint = null" class="btn-close">✕</button>
         </div>
@@ -197,7 +197,7 @@
               <tr>
                 <th>Código</th>
                 <th>Descripción</th>
-                <th>Cantidad</th>
+                <th>Cant.</th>
                 <th>Precio Unit.</th>
                 <th>Subtotal</th>
               </tr>
@@ -240,7 +240,7 @@
           </div>
         </div>
 
-        <div class="print-actions">
+        <div class="print-actions no-print">
           <button @click="printInvoice" class="btn-print">🖨️ Imprimir</button>
           <button @click="invoiceToPrint = null" class="btn-cancel">Cerrar</button>
         </div>
@@ -248,713 +248,6 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-.sales-container {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  background: #f5f5f5;
-  min-height: 100vh;
-}
-
-.main-layout {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-/* Sidebar de productos */
-.products-sidebar {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: fit-content;
-  max-height: calc(100vh - 3rem);
-  display: flex;
-  flex-direction: column;
-}
-
-.products-sidebar h2 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-  font-size: 1.3rem;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  transition: border-color 0.3s;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #3498db;
-}
-
-.products-list {
-  overflow-y: auto;
-  flex: 1;
-}
-
-.product-card {
-  background: #f8f9fa;
-  padding: 1rem;
-  margin-bottom: 0.75rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s;
-  border: 2px solid transparent;
-}
-
-.product-card:hover {
-  background: #e3f2fd;
-  border-color: #3498db;
-  transform: translateX(5px);
-}
-
-.product-info h4 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 1rem;
-}
-
-.product-info .price {
-  color: #27ae60;
-  font-weight: bold;
-  margin: 0.25rem 0;
-}
-
-.product-info .stock {
-  color: #7f8c8d;
-  font-size: 0.85rem;
-  margin: 0.25rem 0;
-}
-
-/* Modal de cantidad */
-.quantity-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  min-width: 350px;
-}
-
-.modal-content h3 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-}
-
-.quantity-input {
-  margin: 1.5rem 0;
-}
-
-.quantity-input label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #555;
-}
-
-.quantity-input input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 1.1rem;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.btn-confirm, .btn-cancel {
-  flex: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-confirm {
-  background: #27ae60;
-  color: white;
-}
-
-.btn-confirm:hover {
-  background: #229954;
-}
-
-.btn-cancel {
-  background: #95a5a6;
-  color: white;
-}
-
-.btn-cancel:hover {
-  background: #7f8c8d;
-}
-
-/* Sección de factura */
-.invoice-section {
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.invoice-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  padding-bottom: 1.5rem;
-  border-bottom: 3px solid #3498db;
-  margin-bottom: 1.5rem;
-}
-
-.company-info h1 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
-}
-
-.company-info p {
-  margin: 0.25rem 0;
-  color: #7f8c8d;
-}
-
-.invoice-number {
-  text-align: right;
-}
-
-.invoice-number h2 {
-  margin: 0;
-  color: #3498db;
-  font-size: 1.8rem;
-}
-
-.invoice-number p {
-  margin: 0.5rem 0 0 0;
-  color: #7f8c8d;
-}
-
-.customer-info {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 6px;
-}
-
-.info-group label {
-  display: block;
-  font-weight: bold;
-  color: #555;
-  margin-bottom: 0.5rem;
-}
-
-.info-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-/* Tabla de factura */
-.invoice-items {
-  margin: 1.5rem 0;
-}
-
-.invoice-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.invoice-table thead {
-  background: #34495e;
-  color: white;
-}
-
-.invoice-table th {
-  padding: 0.75rem;
-  text-align: left;
-  font-weight: 600;
-}
-
-.invoice-table td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.invoice-table tbody tr:hover {
-  background: #f8f9fa;
-}
-
-.empty-invoice {
-  text-align: center;
-  color: #95a5a6;
-  font-style: italic;
-  padding: 2rem !important;
-}
-
-.btn-remove {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.btn-remove:hover {
-  background: #c0392b;
-}
-
-/* Totales */
-.invoice-totals {
-  display: flex;
-  justify-content: flex-end;
-  margin: 1.5rem 0;
-}
-
-.totals-grid {
-  min-width: 350px;
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 6px;
-}
-
-.total-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  font-size: 1.1rem;
-}
-
-.total-final {
-  border-top: 2px solid #34495e;
-  margin-top: 0.5rem;
-  padding-top: 1rem;
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #27ae60;
-}
-
-/* Footer de factura */
-.invoice-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 1.5rem;
-  border-top: 2px solid #e0e0e0;
-}
-
-.payment-method {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.payment-method label {
-  font-weight: bold;
-  color: #555;
-}
-
-.payment-method select {
-  padding: 0.75rem 1rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 1rem;
-}
-
-.btn-clear, .btn-sell {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-clear {
-  background: #95a5a6;
-  color: white;
-}
-
-.btn-clear:hover {
-  background: #7f8c8d;
-}
-
-.btn-sell {
-  background: #27ae60;
-  color: white;
-}
-
-.btn-sell:hover:not(:disabled) {
-  background: #229954;
-  transform: scale(1.05);
-}
-
-.btn-sell:disabled {
-  background: #bdc3c7;
-  cursor: not-allowed;
-}
-
-/* Historial de ventas */
-.sales-history {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.sales-history h2 {
-  margin: 0 0 1rem 0;
-  color: #2c3e50;
-}
-
-.history-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.sale-item {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 6px;
-  border-left: 4px solid #3498db;
-}
-
-.sale-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-}
-
-.sale-number {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-.sale-date {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-}
-
-.sale-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.payment-badge {
-  background: #3498db;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  text-transform: capitalize;
-}
-
-.btn-view {
-  background: #3498db;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.3s;
-}
-
-.btn-view:hover {
-  background: #2980b9;
-  transform: scale(1.05);
-}
-
-/* Modal de impresión */
-.print-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 2rem;
-}
-
-.print-content {
-  background: white;
-  border-radius: 12px;
-  max-width: 900px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.print-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 2px solid #e0e0e0;
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 10;
-}
-
-.print-header h2 {
-  margin: 0;
-  color: #2c3e50;
-}
-
-.btn-close {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.3s;
-}
-
-.btn-close:hover {
-  background: #c0392b;
-  transform: rotate(90deg);
-}
-
-.printable-invoice {
-  padding: 2rem;
-  background: white;
-}
-
-.invoice-print-header {
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: 1.5rem;
-  border-bottom: 3px solid #3498db;
-  margin-bottom: 2rem;
-}
-
-.company-section h1 {
-  margin: 0 0 0.5rem 0;
-  color: #2c3e50;
-  font-size: 1.8rem;
-}
-
-.company-section p {
-  margin: 0.25rem 0;
-  color: #555;
-  font-size: 0.9rem;
-}
-
-.invoice-info-section {
-  text-align: right;
-}
-
-.invoice-info-section h2 {
-  margin: 0 0 0.5rem 0;
-  color: #3498db;
-  font-size: 1.5rem;
-}
-
-.invoice-info-section p {
-  margin: 0.25rem 0;
-  color: #555;
-}
-
-.customer-section {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-}
-
-.customer-section h3 {
-  margin: 0 0 0.75rem 0;
-  color: #2c3e50;
-  font-size: 1.1rem;
-}
-
-.customer-section p {
-  margin: 0.5rem 0;
-  color: #555;
-}
-
-.print-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-}
-
-.print-table thead {
-  background: #34495e;
-  color: white;
-}
-
-.print-table th,
-.print-table td {
-  padding: 0.75rem;
-  text-align: left;
-  border: 1px solid #ddd;
-}
-
-.print-table tbody tr:nth-child(even) {
-  background: #f8f9fa;
-}
-
-.print-totals {
-  display: flex;
-  justify-content: flex-end;
-  margin: 2rem 0;
-}
-
-.totals-section {
-  min-width: 350px;
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 6px;
-}
-
-.total-line {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  font-size: 1rem;
-}
-
-.final-total {
-  border-top: 2px solid #34495e;
-  margin-top: 0.5rem;
-  padding-top: 0.75rem;
-  font-size: 1.3rem;
-  color: #27ae60;
-}
-
-.payment-info {
-  background: #e8f4f8;
-  padding: 1rem;
-  border-radius: 6px;
-  margin: 1.5rem 0;
-  border-left: 4px solid #3498db;
-}
-
-.payment-info p {
-  margin: 0;
-  color: #2c3e50;
-  text-transform: capitalize;
-}
-
-.invoice-footer-print {
-  text-align: center;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid #e0e0e0;
-}
-
-.invoice-footer-print p {
-  margin: 0.5rem 0;
-  color: #7f8c8d;
-  font-size: 0.9rem;
-}
-
-.print-actions {
-  display: flex;
-  gap: 1rem;
-  padding: 1.5rem;
-  border-top: 2px solid #e0e0e0;
-  background: #f8f9fa;
-  position: sticky;
-  bottom: 0;
-}
-
-.btn-print {
-  flex: 1;
-  background: #27ae60;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-print:hover {
-  background: #229954;
-  transform: scale(1.02);
-}
-
-/* Estilos de impresión */
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  
-  .printable-invoice,
-  .printable-invoice * {
-    visibility: visible;
-  }
-  
-  .printable-invoice {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    padding: 1cm;
-  }
-  
-  .print-modal {
-    background: white;
-  }
-  
-  .print-header,
-  .print-actions {
-    display: none !important;
-  }
-}
-</style>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
@@ -1126,3 +419,832 @@ function formatPaymentMethod(method) {
   return methods[method] || method;
 }
 </script>
+
+<style scoped>
+.sales-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.products-sidebar {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  max-height: calc(100vh - 3rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.products-sidebar h2 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.products-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.product-card {
+  background: #f8f9fa;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.product-card:hover {
+  background: #e3f2fd;
+  border-color: #3498db;
+  transform: translateX(5px);
+}
+
+.product-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.product-info .price {
+  color: #27ae60;
+  font-weight: bold;
+  margin: 0.25rem 0;
+}
+
+.product-info .stock {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+  margin: 0.25rem 0;
+}
+
+.quantity-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  min-width: 350px;
+}
+
+.modal-content h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+.quantity-input {
+  margin: 1.5rem 0;
+}
+
+.quantity-input label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.quantity-input input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1.1rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-confirm, .btn-cancel {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-confirm {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: #229954;
+}
+
+.btn-cancel {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #7f8c8d;
+}
+
+.invoice-section {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid #3498db;
+  margin-bottom: 1.5rem;
+}
+
+.company-info h1 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.8rem;
+}
+
+.company-info p {
+  margin: 0.25rem 0;
+  color: #7f8c8d;
+}
+
+.invoice-number {
+  text-align: right;
+}
+
+.invoice-number h2 {
+  margin: 0;
+  color: #3498db;
+  font-size: 1.8rem;
+}
+
+.invoice-number p {
+  margin: 0.5rem 0 0 0;
+  color: #7f8c8d;
+}
+
+.customer-info {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.info-group label {
+  display: block;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.info-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.invoice-items {
+  margin: 1.5rem 0;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.invoice-table thead {
+  background: #34495e;
+  color: white;
+}
+
+.invoice-table th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.invoice-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.invoice-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.empty-invoice {
+  text-align: center;
+  color: #95a5a6;
+  font-style: italic;
+  padding: 2rem !important;
+}
+
+.btn-remove {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-remove:hover {
+  background: #c0392b;
+}
+
+.invoice-totals {
+  display: flex;
+  justify-content: flex-end;
+  margin: 1.5rem 0;
+}
+
+.totals-grid {
+  min-width: 350px;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.total-final {
+  border-top: 2px solid #34495e;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.invoice-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e0e0e0;
+}
+
+.payment-method {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.payment-method label {
+  font-weight: bold;
+  color: #555;
+}
+
+.payment-method select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-clear, .btn-sell {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-clear {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-clear:hover {
+  background: #7f8c8d;
+}
+
+.btn-sell {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-sell:hover:not(:disabled) {
+  background: #229954;
+  transform: scale(1.05);
+}
+
+.btn-sell:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.sales-history {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sales-history h2 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+.history-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sale-item {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+}
+
+.sale-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.sale-number {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.sale-date {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.sale-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-badge {
+  background: #3498db;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.btn-view {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.btn-view:hover {
+  background: #2980b9;
+  transform: scale(1.05);
+}
+
+.print-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 2rem;
+}
+
+.print-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.print-header h2 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.btn-close {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+}
+
+.btn-close:hover {
+  background: #c0392b;
+  transform: rotate(90deg);
+}
+
+.printable-invoice {
+  padding: 2rem;
+  background: white;
+  max-width: 21cm;
+  margin: 0 auto;
+}
+
+.invoice-print-header {
+  display: table;
+  width: 100%;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid #3498db;
+}
+
+.company-section {
+  display: table-cell;
+  width: 60%;
+  vertical-align: top;
+}
+
+.company-section h1 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.6rem;
+}
+
+.company-section p {
+  margin: 0.25rem 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.invoice-info-section {
+  display: table-cell;
+  width: 40%;
+  text-align: right;
+  vertical-align: top;
+}
+
+.invoice-info-section h2 {
+  margin: 0 0 0.5rem 0;
+  color: #3498db;
+  font-size: 1.4rem;
+}
+
+.invoice-info-section p {
+  margin: 0.25rem 0;
+  color: #555;
+}
+
+.customer-section {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.customer-section h3 {
+  margin: 0 0 0.75rem 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.customer-section p {
+  margin: 0.5rem 0;
+  color: #555;
+}
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.print-table thead {
+  background: #34495e;
+  color: white;
+}
+
+.print-table th,
+.print-table td {
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.print-table th:nth-child(3),
+.print-table td:nth-child(3) {
+  text-align: center;
+}
+
+.print-table th:nth-child(4),
+.print-table td:nth-child(4),
+.print-table th:nth-child(5),
+.print-table td:nth-child(5) {
+  text-align: right;
+}
+
+.print-table tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.print-totals {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.totals-section {
+  min-width: 350px;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.final-total {
+  border-top: 2px solid #34495e;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  font-size: 1.3rem;
+  color: #27ae60;
+}
+
+.payment-info {
+  background: #e8f4f8;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  border-left: 4px solid #3498db;
+}
+
+.payment-info p {
+  margin: 0;
+  color: #2c3e50;
+  text-transform: capitalize;
+}
+
+.invoice-footer-print {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e0e0e0;
+}
+
+.invoice-footer-print p {
+  margin: 0.5rem 0;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.print-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 2px solid #e0e0e0;
+  background: #f8f9fa;
+  position: sticky;
+  bottom: 0;
+}
+
+.btn-print {
+  flex: 1;
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-print:hover {
+  background: #229954;
+  transform: scale(1.02);
+}
+
+/* Estilos específicos para impresión */
+@media print {
+  /* Ocultar todo excepto la factura */
+  body * {
+    visibility: hidden;
+  }
+  
+  .printable-invoice,
+  .printable-invoice * {
+    visibility: visible;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .printable-invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0.5cm;
+    margin: 0;
+  }
+  
+  .print-modal {
+    background: white;
+    position: static;
+  }
+  
+  .print-content {
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    box-shadow: none;
+  }
+  
+  /* Asegurar que el encabezado no se corte */
+  .invoice-print-header {
+    display: block;
+    page-break-inside: avoid;
+  }
+  
+  .company-section,
+  .invoice-info-section {
+    display: inline-block;
+    vertical-align: top;
+  }
+  
+  .company-section {
+    width: 55%;
+  }
+  
+  .invoice-info-section {
+    width: 40%;
+    float: right;
+  }
+  
+  /* Evitar saltos de página en lugares incorrectos */
+  .customer-section,
+  .payment-info {
+    page-break-inside: avoid;
+  }
+  
+  .print-table {
+    page-break-inside: auto;
+  }
+  
+  .print-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  .print-table thead {
+    display: table-header-group;
+  }
+  
+  .print-totals {
+    page-break-inside: avoid;
+  }
+  
+  /* Ajustar tamaños para impresión */
+  .invoice-print-header {
+    font-size: 95%;
+  }
+  
+  .print-table {
+    font-size: 90%;
+  }
+  
+  /* Asegurar márgenes adecuados */
+  @page {
+    margin: 1.5cm 1cm;
+    size: letter portrait;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .products-sidebar {
+    max-height: 400px;
+  }
+  
+  .invoice-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .invoice-number {
+    text-align: left;
+  }
+  
+  .customer-info {
+    grid-template-columns: 1fr;
+  }
+  
+  .invoice-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .payment-method {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+</style>
