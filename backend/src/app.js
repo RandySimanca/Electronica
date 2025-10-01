@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config, validateConfig } from './config/env.js';
 import { requestLogger } from './middleware/logger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -7,6 +9,10 @@ import { successResponse } from './utils/response.js';
 import routes from './routes/index.js';
 import initDatabase from './config/initDatabase.js';
 import { closePool } from './config/database.js';
+
+// Para usar __dirname con ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Validar configuración antes de iniciar
 validateConfig();
@@ -44,11 +50,9 @@ if (config.NODE_ENV === 'development') {
   app.use(requestLogger);
 }
 
-// Rutas de la API
-app.use('/api', routes);
-
+// ============ RUTAS DE LA API ============
 // Ruta de estado de la API
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   successResponse(res, {
     name: 'Electronics Workshop API',
     version: '1.0.0',
@@ -59,7 +63,7 @@ app.get('/', (req, res) => {
 });
 
 // Ruta de salud
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   successResponse(res, {
     status: 'healthy',
     uptime: process.uptime(),
@@ -68,10 +72,46 @@ app.get('/health', (req, res) => {
   }, 'Sistema saludable');
 });
 
-// Middleware para rutas no encontradas
-app.all(/.*/, notFoundHandler);
+// Todas las rutas de la API con prefijo /api
+app.use('/api', routes);
 
-// Middleware global de manejo de errores
+// ============ SERVIR FRONTEND VUE EN PRODUCCIÓN ============
+const isProduction = config.NODE_ENV === 'production';
+const serveFrontend = process.env.SERVE_FRONTEND === 'true' || isProduction;
+
+if (serveFrontend) {
+  // Path al build de Vue (carpeta dist en la raíz del proyecto)
+  const distPath = path.join(__dirname, '../../dist');
+  
+  console.log('📦 Sirviendo frontend desde:', distPath);
+  
+  // Servir archivos estáticos de Vue
+  app.use(express.static(distPath));
+  
+  // Todas las rutas que NO sean /api/* retornan el index.html de Vue
+  // Esto permite que Vue Router maneje las rutas del frontend
+  app.get('*', (req, res, next) => {
+    // Si es una ruta de API, pasar al siguiente middleware
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    
+    // Servir index.html para todas las demás rutas
+    res.sendFile(path.join(distPath, 'index.html'), (err) => {
+      if (err) {
+        console.error('❌ Error al servir index.html:', err);
+        res.status(500).send('Error al cargar la aplicación');
+      }
+    });
+  });
+} else {
+  console.log('ℹ️  Frontend no se servirá desde el backend (modo desarrollo)');
+  
+  // En desarrollo, solo manejar rutas de API
+  app.all(/.*/, notFoundHandler);
+}
+
+// Middleware global de manejo de errores (debe ir al final)
 app.use(errorHandler);
 
 // Inicializar base de datos y servidor
@@ -87,9 +127,13 @@ const startServer = async () => {
 │     🔧 Electronics Workshop API             │
 ├─────────────────────────────────────────────┤
 │ 🌟 Estado: Funcionando                      │
-│ 🚀 Puerto: ${config.PORT}                            │
-│ 🌍 Entorno: ${config.NODE_ENV}                    │
-│ 📅 Iniciado: ${new Date().toLocaleString()}       │
+│ 🚀 Puerto: ${config.PORT.toString().padEnd(30)}│
+│ 🌍 Entorno: ${config.NODE_ENV.padEnd(28)}│
+│ 🎨 Frontend: ${serveFrontend ? 'Activo'.padEnd(27) : 'Desactivado'.padEnd(27)}│
+│ 📅 Iniciado: ${new Date().toLocaleString().padEnd(25)}│
+├─────────────────────────────────────────────┤
+│ 📡 API: http://localhost:${config.PORT}/api          │
+${serveFrontend ? `│ 🌐 App: http://localhost:${config.PORT}               │` : ''}
 └─────────────────────────────────────────────┘
       `);
     });
