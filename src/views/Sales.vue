@@ -954,6 +954,23 @@
     display: none !important;
   }
 }
+
+/* Layout responsivo */
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr; /* cambia a 1 sola columna */
+  }
+
+  .products-sidebar {
+    order: 2; /* productos se muestran después */
+    max-height: unset; /* evitar scroll forzado */
+  }
+
+  .invoice-section {
+    order: 1; /* factura primero */
+  }
+}
+
 </style>
 
 <script setup>
